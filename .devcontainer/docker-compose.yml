@@ -1,22 +1,30 @@
 version: '3.8'
 
 services: 
-  app:
+  # PHP-FPM Service
+  php:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: php.Dockerfile
+    # command: sleep infinity
+    # network_mode: service:db
 
+  # NGINX Service
+  web:
+    build:
+      context: .
+      dockerfile: nginx.Dockerfile
     volumes:
+      # - ./www:/var/www/html
       - ../..:/workspaces:cached
+    ports:
+      - "8080:80"
+    # command: sleep infinity
+    # network_mode: service:db
+    depends_on:
+      - php  # Depends on the PHP-FPM service
+      - db  # Depends on the MySQL database service
 
-    # Overrides default command so things don't shut down after the process ends.
-    command: sleep infinity
-
-    # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
-    network_mode: service:db
-
-    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally. 
-    # (Adding the "ports" property to this file will not forward from a Codespace.)
 
   db:
     image: mariadb:10.4

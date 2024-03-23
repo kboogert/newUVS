@@ -1,4 +1,11 @@
-FROM mcr.microsoft.com/devcontainers/php:1-8.2-bookworm
+FROM php:8.2-fpm
+
+# Use the default production configuration
+# RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
+
+# Install Git
+RUN apt-get install git
 
 # Install MariaDB client
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
@@ -8,6 +15,11 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 # Install php-mysql driver
 RUN docker-php-ext-install mysqli pdo pdo_mysql
 
+# Install xdebug
+RUN pecl install xdebug-3.2.1 \
+	&& docker-php-ext-enable xdebug
+
+    
 # [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 #     && apt-get -y install --no-install-recommends <your-package-list-here>
